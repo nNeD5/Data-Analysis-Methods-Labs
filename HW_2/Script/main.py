@@ -1,4 +1,4 @@
-from Script import calculation
+import calculation
 import visualisation
 
 

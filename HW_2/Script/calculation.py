@@ -58,10 +58,10 @@ def delete_outlier(data: pd.DataFrame) -> pd.DataFrame:
 
 def main():
     # delete null data
-    exmas = pd.read_csv("../Data/exams.csv")
-    exmas.dropna()
-    exmas = delete_outlier(exmas)
-    exmas.to_csv("exam_cleared.csv", index=False)
+    # exmas = pd.read_csv("../Data/exams.csv")
+    # exmas.dropna()
+    # exmas = delete_outlier(exmas)
+    # exmas.to_csv("exam_cleared.csv", index=False)
 
     # save numerical data
     exmas_score = pd.read_csv("../Data/exam_cleared.csv", usecols=score_columns)
