@@ -15,16 +15,11 @@ def get_clusters(data: list) -> KMeans:
 
 def save_clusters(data: list) -> None:
     k_means = get_clusters(data)
-    labels = k_means.labels_
-    y = np.array([data[i][1] for i in range(0, len(data))])
-    test = np.hstack(y)
-    print(test)
-    np.savetxt("clusters.csv", test, fmt="% s",
+    np.savetxt("Data/clusters.csv", data, fmt="% s",
                header="average exam score,cluster number", comments='')
 
     centers = k_means.cluster_centers_
-    print(centers)
-    np.savetxt("centers.csv", centers, fmt="% s")
+    np.savetxt("Data/centers.csv", centers, fmt="% s")
 
 
 def clusters_visualization(data: list):
@@ -51,7 +46,7 @@ def main():
     average_exam_score = pd.Series(exam_scores.mean(axis=1))
     average_exam_score = average_exam_score.tolist()
     row_number_and_average_exam_score = list(zip(x, average_exam_score))
-    # clusters_visualization(row_number_and_average_exam_score)
+    clusters_visualization(row_number_and_average_exam_score)
     save_clusters(row_number_and_average_exam_score)
 
 
