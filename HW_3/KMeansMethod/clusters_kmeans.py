@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
+from collections import Counter
 
 
 CLUSTERS_NUMBER = 3
@@ -15,8 +16,11 @@ def get_clusters(data: list) -> KMeans:
 
 def save_clusters(data: list) -> None:
     k_means = get_clusters(data)
-    np.savetxt("Data/clusters.csv", data, fmt="% s",
-               header="average exam score,cluster number", comments='')
+    points_number_in_clusters = []
+    for k, v in Counter(k_means.labels_).items():
+        points_number_in_clusters.append([k, v])
+    np.savetxt("Data/clusters.csv", points_number_in_clusters, fmt="% s",
+               header="cluster number, points number", comments='')
 
     centers = k_means.cluster_centers_
     np.savetxt("Data/centers.csv", centers, fmt="% s")
