@@ -5,6 +5,7 @@ from sklearn.metrics import accuracy_score
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from mlxtend.plotting import plot_decision_regions
 
 
 def main():
@@ -14,26 +15,32 @@ def main():
     x = df[:, :3]
     y = df[:, 3]
 
-    x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=100)
-    # model = SVC(kernel='poly', degree=4)
-    model = SVC(kernel='linear')
+    x_train, x_test, y_train, y_test = train_test_split(x, y)
+    model = SVC(kernel='poly')
     model.fit(x_train, y_train)
     predictions = model.predict(x_test)
     print(accuracy_score(predictions, y_test))
 
-    # Reduce demiseion to plot data
+    xx, yy = np.mgrid[0:1:200j,0:2:200j]
+    print(len(xx))
+    print(len(xx[0]))
+    print(xx.ravel())
+    
+    # z = model.decision_function(np.c_[xx.ravel(), yy.ravel()])
+    print("==================")
     # Plot
-    # z = lambda x,y: (-model.intercept_[0]-model.coef_[0][0]*x -model.coef_[0][1]*y) / model.coef_[0][2]
-    # tmp = np.linspace(0,1,30)
-    # x_,y_ = np.meshgrid(tmp,tmp)
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot3D(x[y==0,0], x[y==0,1], x[y==0,2],'ob')
-    ax.plot3D(x[y==1,0], x[y==1,1], x[y==1,2],'or')
-    ax.plot3D(x[y==2,0], x[y==2,1], x[y==2,2],'og')
-    # ax.plot_surface(x_, y_, z(x_, y_))
-    # ax.view_init(30, 60)
-    plt.show()
+#    fig = plt.figure()
+#     ax = fig.add_subplot(111, projection='3d')
+#     ax.scatter(x[:, 0], x[:, 1], x[:, 2], c=y, edgecolors="k")
+#     ax.contour(
+#         x,
+#         y,
+#         z,
+#         colors=["k", "k", "k"],
+#         linestyles=["--", "-", "--"],
+#         levels=[-0.5, 0, 0.5],
+#     )
+    # plt.show()
 
 
 if __name__ == '__main__':

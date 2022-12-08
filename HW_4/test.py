@@ -1,40 +1,81 @@
-from sklearn.svm import SVC
+
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn import svm, datasets
-from mpl_toolkits.mplot3d import Axes3D
+from sklearn import svm
 
-iris = datasets.load_iris()
-print(type(iris))
-X = iris.data[:, :3]  # we only take the first three features.
-# print(iris.data)
-Y = iris.target
-print(type(X))
 
-#make it binary classification problem
-X = X[np.logical_or(Y==0,Y==1)]
-Y = Y[np.logical_or(Y==0,Y==1)]
-print(Y)
+# Our dataset and targets
+X = np.c_[
+    (0.4, -0.7),
+    (-1.5, -1),
+    (-1.4, -0.9),
+    (-1.3, -1.2),
+    (-1.1, -0.2),
+    (-1.2, -0.4),
+    (-0.5, 1.2),
+    (-1.5, 2.1),
+    (1, 1),
+    # --
+    (1.3, 0.8),
+    (1.2, 0.5),
+    (0.2, -2),
+    (0.5, -2.4),
+    (0.2, -2.3),
+    (0, -2.7),
+    (1.3, 2.1),
+].T
+Y = [0] * 8 + [1] * 8
 
-model = svm.SVC(kernel='linear')
-clf = model.fit(X, Y)
+# figure number
+fignum = 1
 
-# The equation of the separating plane is given by all x so that np.dot(svc.coef_[0], x) + b = 0.
-# Solve for w3 (z)
-z = lambda x,y: (-clf.intercept_[0]-clf.coef_[0][0]*x -clf.coef_[0][1]*y) / clf.coef_[0][2]
+# fit the model
+kernel = "poly"
+clf = svm.SVC(kernel=kernel, gamma=2)
+clf.fit(X, Y)
 
-tmp = np.linspace(-5,5,30)
-x,y = np.meshgrid(tmp,tmp)
+# plot the line, the points, and the nearest vectors to the plane
+plt.figure(fignum, figsize=(4, 3))
+plt.clf()
 
-fig = plt.figure()
-ax  = fig.add_subplot(111, projection='3d')
-ax.plot3D(X[Y==0,0], X[Y==0,1], X[Y==0,2],'ob')
-ax.plot3D(X[Y==1,0], X[Y==1,1], X[Y==1,2],'sr')
-ax.plot_surface(x, y, z(x,y))
-ax.view_init(30, 60)
+plt.scatter(
+    clf.support_vectors_[:, 0],
+    clf.support_vectors_[:, 1],
+    s=80,
+    facecolors="none",
+    zorder=10,
+    edgecolors="k",
+)
+plt.scatter(X[:, 0], X[:, 1], c=Y, zorder=10, cmap=plt.cm.Paired, edgecolors="k")
+
+plt.axis("tight")
+x_min = -3
+x_max = 3
+y_min = -3
+y_max = 3
+
+XX, YY = np.mgrid[x_min:x_max:200j, y_min:y_max:200j]
+print(len(XX))
+print(len(XX[0]))
+Z = clf.decision_function(np.c_[XX.ravel(), YY.ravel()])
+
+# Put the result into a color plot
+Z = Z.reshape(XX.shape)
+plt.figure(fignum, figsize=(4, 3))
+plt.pcolormesh(XX, YY, Z > 0, cmap=plt.cm.Paired)
+plt.contour(
+    XX,
+    YY,
+    Z,
+    colors=["k", "k", "k"],
+    linestyles=["--", "-", "--"],
+    levels=[-0.5, 0, 0.5],
+)
+
+plt.xlim(x_min, x_max)
+plt.ylim(y_min, y_max)
+
+plt.xticks(())
+plt.yticks(())
+fignum = fignum + 1
 # plt.show()
-print(X.shape)
-print(Y.shape) 
-print(type(X))
-print(type(Y))
-#print(X[Y==1, 0])
