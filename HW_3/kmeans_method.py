@@ -58,6 +58,7 @@ def main():
 
     pca_2 = PCA(n_components=2)
     df = pca_2.fit_transform(data_scaled)
+
     elbow_method_visualization(df, 30)
 
     kmeans = KMeans(n_clusters=CLUSTERS_NUMBER)

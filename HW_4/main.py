@@ -1,46 +1,48 @@
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from mlxtend.plotting import plot_decision_regions
+
+import random
 
 
 def main():
     df = pd.read_csv('Data/cluster_data_0-2.csv')
-    # x = df[['math score', 'reading score', 'writing score']]
-    df = df.to_numpy()
-    x = df[:, :3]
-    y = df[:, 3]
+    print(df)
+    data = df[["math score", "reading score", "writing score"]]
+    y = df["label"]
+    scaler = StandardScaler()
+    data_scaled = pd.DataFrame(scaler.fit_transform(data))
+    pca_2 = PCA(n_components=2)
+    x = pca_2.fit_transform(data_scaled)
+    print(typex)
 
     x_train, x_test, y_train, y_test = train_test_split(x, y)
-    model = SVC(kernel='poly')
-    model.fit(x_train, y_train)
-    predictions = model.predict(x_test)
-    print(accuracy_score(predictions, y_test))
+    clf = SVC(kernel='linear')
+    clf.fit(x_train, y_train)
+    predictions = clf.predict(x_test)
+    print("Accuracy:", accuracy_score(predictions, y_test))
 
-    xx, yy = np.mgrid[0:1:200j,0:2:200j]
-    print(len(xx))
-    print(len(xx[0]))
-    print(xx.ravel())
-    
-    # z = model.decision_function(np.c_[xx.ravel(), yy.ravel()])
-    print("==================")
+    w = clf.coef_[0]
+    b = clf.intercept_[0]
+    x_visual = np.linspace(32,57)
+    y_visual = -(w[0] / w[1]) * x_visual - b / w[1]
+
     # Plot
-#    fig = plt.figure()
-#     ax = fig.add_subplot(111, projection='3d')
-#     ax.scatter(x[:, 0], x[:, 1], x[:, 2], c=y, edgecolors="k")
-#     ax.contour(
-#         x,
-#         y,
-#         z,
-#         colors=["k", "k", "k"],
-#         linestyles=["--", "-", "--"],
-#         levels=[-0.5, 0, 0.5],
-#     )
-    # plt.show()
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    # ax.scatter(x[:, 0], x[:, 1], c=y, edgecolors="k")
+    # ax.scatter(x=x_train[0], y=x_train[1], c=y, edgecolors="k")
+    ax.scatter(x[:, 0], x[:, 1], c=y, cmap=plt.cm.coolwarm)
+    ax.plot(x_visual, y_visual)
+    plt.savefig("/mnt/d/plt.png")
+
 
 
 if __name__ == '__main__':

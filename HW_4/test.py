@@ -1,81 +1,36 @@
+from seaborn import load_dataset, pairplot
+from seaborn import scatterplot
+
+import matplotlib.pyplot as plt
 
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn import svm
+import pandas as pd
+
+from sklearn.svm import SVC
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 
-# Our dataset and targets
-X = np.c_[
-    (0.4, -0.7),
-    (-1.5, -1),
-    (-1.4, -0.9),
-    (-1.3, -1.2),
-    (-1.1, -0.2),
-    (-1.2, -0.4),
-    (-0.5, 1.2),
-    (-1.5, 2.1),
-    (1, 1),
-    # --
-    (1.3, 0.8),
-    (1.2, 0.5),
-    (0.2, -2),
-    (0.5, -2.4),
-    (0.2, -2.3),
-    (0, -2.7),
-    (1.3, 2.1),
-].T
-Y = [0] * 8 + [1] * 8
+# Rerunning the algorithm with a binary classifier
+df = load_dataset('penguins')
+df = df.dropna()
+df = df[df['species'] != 'Gentoo']    # This limits us to two classes
 
-# figure number
-fignum = 1
+# X = df.select_dtypes('number')
+X = df[['bill_length_mm', 'bill_depth_mm']]
+y = df['species']
 
-# fit the model
-kernel = "poly"
-clf = svm.SVC(kernel=kernel, gamma=2)
-clf.fit(X, Y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=100)
 
-# plot the line, the points, and the nearest vectors to the plane
-plt.figure(fignum, figsize=(4, 3))
-plt.clf()
+clf = SVC(kernel='linear')
+clf.fit(X_train, y_train)
 
-plt.scatter(
-    clf.support_vectors_[:, 0],
-    clf.support_vectors_[:, 1],
-    s=80,
-    facecolors="none",
-    zorder=10,
-    edgecolors="k",
-)
-plt.scatter(X[:, 0], X[:, 1], c=Y, zorder=10, cmap=plt.cm.Paired, edgecolors="k")
+# Visualizing the linear function for our SVM classifier
+w = clf.coef_[0]
+b = clf.intercept_[0]
+x_visual = np.linspace(32,57)
+y_visual = -(w[0] / w[1]) * x_visual - b / w[1]
 
-plt.axis("tight")
-x_min = -3
-x_max = 3
-y_min = -3
-y_max = 3
-
-XX, YY = np.mgrid[x_min:x_max:200j, y_min:y_max:200j]
-print(len(XX))
-print(len(XX[0]))
-Z = clf.decision_function(np.c_[XX.ravel(), YY.ravel()])
-
-# Put the result into a color plot
-Z = Z.reshape(XX.shape)
-plt.figure(fignum, figsize=(4, 3))
-plt.pcolormesh(XX, YY, Z > 0, cmap=plt.cm.Paired)
-plt.contour(
-    XX,
-    YY,
-    Z,
-    colors=["k", "k", "k"],
-    linestyles=["--", "-", "--"],
-    levels=[-0.5, 0, 0.5],
-)
-
-plt.xlim(x_min, x_max)
-plt.ylim(y_min, y_max)
-
-plt.xticks(())
-plt.yticks(())
-fignum = fignum + 1
-# plt.show()
+scatterplot(data = X_train, x='bill_length_mm', y='bill_depth_mm', hue=y_train)
+plt.plot(x_visual, y_visual)
+plt.savefig("/mnt/d/plt.png")
